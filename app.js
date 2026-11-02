@@ -1,179 +1,199 @@
-var inpDay = document.querySelector("#inpDay");
-var inpMonth = document.querySelector("#inpMonth");
-var inpYear = document.querySelector("#inpYear");
-var day = document.querySelector(".day");
-var month = document.querySelector(".month");
-var year = document.querySelector(".year");
-var span = document.querySelector(".haha")
-var form = document.querySelector("form");
-function checkDay(){
-    inpDay.addEventListener("blur",()=>{
-        var valDay = inpDay.value;
-        if(valDay.length > 2){
-            alert("Vui lòng nhập đúng định dạng ngày")
-            inpDay.value = ''
-            day.innerHTML = '';
-        }
-        else{
-            day.innerHTML = valDay;
-            return true;
-        }
+const $ = document.querySelector.bind(document)
+var iconSearch = $('.fa-magnifying-glass');
+var input = $("input");
+var search = $(".search");
+var city = $(".city");
+var nhietdo = $(".nhietdo");
+var dayNight = $(".day-night");
+var icon = $(".icon img");
+var iconTomorrow = $('.item__tomorrow .icon img');
+var textWeather = $(".textWeather");
+var windText = $(".wind");
+var eyeText = $(".eye");
+var cloudText = $(".cloud");
+var sunRise = $(".sunrise");
+var sunSet = $(".sunset");
+var humidity = $(".humidity");
+var contentHeader = document.querySelectorAll('.content__header h3');
+var bodyContents = document.querySelectorAll('.body-content')
+contentHeader.forEach((itemHeader,index)=>{
+    var bodyContent = bodyContents[index]
+    itemHeader.addEventListener("click",()=>{
+    console.log(bodyContent);
+        $('.content__header h3.active').classList.remove("active")
+        itemHeader.classList.add("active")
+        $('.body-content.active').classList.remove("active")
+        bodyContent.classList.add("active")
     })
+})
+iconSearch.addEventListener("click",()=>{
+    city.classList.toggle("active");
+    search.classList.toggle("active")
+    iconSearch.classList.toggle("active")
+    input.classList.toggle("active");
+})
+setInterval(function(){
+    var time = new Date();
+    var hours = time.getHours();
+    var minutes = time.getMinutes();
+    var seconds = time.getSeconds();
+    var date = time.getDate();
+    var month = time.getMonth();
+    var boxDate = $('.date');
+    var day = time.getDay();
+    var dayTomorrow;
+    switch (day){
+        case 0:
+            dayTomorrow = 'Thứ 2'
+            break
+        case 1:
+            dayTomorrow = 'Thứ 3'
+            break
+        case 2:
+            dayTomorrow = 'Thứ 4'
+            break
+        case 3:
+            dayTomorrow = 'Thứ 5'
+            break
+        case 4:
+            dayTomorrow = 'Thứ 6'
+            break
+        case 5:
+            dayTomorrow = 'Thứ 7'
+            break
+        case 6:
+            dayTomorrow = 'Chủ nhật'
+            break
+    }
+    var dateTomorrow = $('.dateTomorrow');
+    hours = hours< 10 ? `0${hours}`: hours
+    minutes = minutes< 10 ? `0${minutes}`: minutes
+    seconds = seconds< 10 ? `0${seconds}`: seconds
+    boxDate.innerHTML = `${hours}:${minutes}:${seconds} PM, Ngày ${date} Tháng ${month + 1}`;
+    dateTomorrow.innerHTML = `${dayTomorrow}, Ngày ${date+1} Tháng ${month + 2}`;
+},1000)
+var preTime = new Date();
+var hoursPre = preTime.getHours();
+var container = $('.container')
+if(hoursPre > '6' && hoursPre < '18'){
+    container.style.background = 'radial-gradient(rgb(0,132,239) 0%, rgb(0,85,154) 100%)'
 }
-checkDay();
-function checkMonth(){
-    inpMonth.addEventListener("blur",()=>{
-        var valMonth = inpMonth.value;
-        if(valMonth.length > 2){
-            alert("Vui lòng nhập đúng định dạng tháng")
-            inpMonth.value = ''
-            month.innerHTML = '';
-        }
-        else{
-            month.innerHTML = valMonth;
-            return true;
-        }
-    })
+else{
+    container.style.background = 'radial-gradient(rgb(0,76,152) 0%, rgb(0,44,87) 100%)'
 }
-checkMonth();
-function checkYear(){
-    inpYear.addEventListener("blur",()=>{
-        var valYear = inpYear.value;
-        if(valYear.length > 4){
-            alert("Vui lòng nhập đúng định dạng năm")
-            inpYear.value = ''
-            year.innerHTML = '';
+async function weatherAPI(cityApi){
+    var content = $('.content')
+    var apiId = 'e2bd9c487f7266bd3d3ead99561e938c'; 
+    var api = `https://api.openweathermap.org/data/2.5/weather?q=${cityApi}&lang=vi&appid=${apiId}`  
+    var dataApi = await fetch(api).then(response => response.json());  
+    var apiWeather = `https://api.openweathermap.org/data/2.5/forecast?q=${cityApi}&cnt=40&lang=vi&appid=${apiId}`;
+    var dataWeather = await fetch(apiWeather).then(response => response.json())
+    console.log(dataApi);
+    console.log(dataWeather);
+    if(dataApi.code == 200 || dataWeather.cod == 200){
+        content.classList.remove("hide");
+        city.innerText = dataWeather.city.name
+        nhietdo.innerText = Math.floor(dataApi.main.temp-273)
+        icon.src =`http://openweathermap.org/img/wn/${dataApi.weather[0].icon}@2x.png`
+        if(dataApi.weather[0].icon == '01d' || dataApi.weather[0].icon == '01n'){
+            textWeather.innerText = dataApi.weather[0].description.charAt(0).toUpperCase() + dataApi.weather[0].description.slice(1)
+        }else if(dataApi.weather[0].icon == '02d' || dataApi.weather[0].icon == '02n'){
+            textWeather.innerText = dataApi.weather[0].description.charAt(0).toUpperCase() + dataApi.weather[0].description.slice(1)
+        }else if(dataApi.weather[0].icon == '03d' || dataApi.weather[0].icon == '03n'){
+            textWeather.innerText = dataApi.weather[0].description.charAt(0).toUpperCase() + dataApi.weather[0].description.slice(1)
+        }else if(dataApi.weather[0].icon == '04d' || dataApi.weather[0].icon == '04n'){
+            textWeather.innerText = dataApi.weather[0].description.charAt(0).toUpperCase() + dataApi.weather[0].description.slice(1)
+        }else if(dataApi.weather[0].icon == '10d' || dataApi.weather[0].icon == '10n'){
+            textWeather.innerText = dataApi.weather[0].description.charAt(0).toUpperCase() + dataApi.weather[0].description.slice(1)
         }
-        else{
-            year.innerHTML = valYear;
-            return true;
+        windText.innerHTML = `<i class="fa-solid fa-wind"></i>Tốc độ gió: ${dataApi.wind.speed}m/s`;
+        eyeText.innerHTML = `<i class="fa-regular fa-eye"></i>Tầm nhìn: ${dataApi.visibility}m`;
+        cloudText.innerHTML = `<i class="fa-solid fa-cloud"></i>Mây: ${dataApi.clouds.all}%`;
+        humidity.innerHTML = `<i class="fa-solid fa-droplet"></i>Độ ẩm: ${dataApi.main.humidity}%`;
+        var timeSunrise = new Date(dataApi.sys.sunrise*1000);
+        var timeSunSet = new Date(dataApi.sys.sunset*1000);
+        var itemTimeSunrise = timeSunrise.toLocaleTimeString(undefined,"Asia/Kolkata").replace(':00',''); 
+        var itemTimeSunSet = timeSunSet.toLocaleTimeString(undefined,"Asia/Kolkata").replace(':00',''); 
+        sunRise.innerHTML = `<i class="fa-solid fa-sun"></i>Mặt trời mọc: ${itemTimeSunrise}`;
+        sunSet.innerHTML = `<i class="fa-solid fa-mountain-sun"></i>Mặt trời lặn: ${itemTimeSunSet}`;
+        var boxHourly = document.querySelector(".box__hourly");
+        for(let i=1; i < 7;i++){
+            var div = document.createElement('div')
+            var timeHourly = new Date(dataWeather.list[i].dt_txt)
+            timeHourly = timeHourly.toLocaleTimeString().replace(':00','')
+            div.classList.add("item__hourly")
+            div.innerHTML = `<div class="time__hourly">${timeHourly}</div>
+                            <img src="http://openweathermap.org/img/wn/${dataWeather.list[i].weather[0].icon}@2x.png" alt="">
+                            <span class="temp_hourly">${Math.round(dataWeather.list[i].main.temp -273)}°C</span>`
+            boxHourly.appendChild(div)
         }
-    })
-}
-checkYear();
-form.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    var textBoy = document.querySelector("#textBoy")
-    var textBoyimg = document.querySelector("#textBoyimg");
-    var textGirl = document.querySelector("#textGirl")
-    var textGirlimg = document.querySelector("#textGirlimg");
-    if(inpDay.value.trim()=="" || inpMonth.value.trim()=="" || inpYear.value.trim()=="" || textBoy.value == "" || textGirl.value ==""){
-        alert("Yêu cầu nhập đầy đủ thông tin")
-        return false;
     }
     else{
-        textBoyimg.innerText = textBoy.value;
-        textGirlimg.innerText = textGirl.value;
+        content.classList.add("hide")
     }
-    checkDay();
-    checkMonth();
-    checkYear();
-    var valYear = inpYear.value;
-    var valMonth = inpMonth.value;
-    var valDay = inpDay.value;
-    var dateEle = ''+valDay+'-'+valMonth+'-'+valYear+''
-    var arr = dateEle.split('-');
-    var newDate = arr[2]+'-'+arr[1]+'-'+arr[0]
-    var dateNew = new Date(newDate).getTime();
-    function setTimeBox(){
-        var now = new Date().getTime()
-        var D = now - dateNew
-        var months = Math.floor(D/(1000*60*60*24*30))
-        var textdays = Math.floor(D/(1000*60*60*24))
-        var days = Math.floor(((D/(1000*60*60*24))-(months*(30))+1))
-        var hours = Math.floor(D/(1000*60*60))
-        var minutes = Math.floor(D/(1000*60))
-        var seconds = Math.floor(D/(1000))
-        hours %=24
-        minutes %=60
-        seconds %=60
-        document.getElementById("itemNumberMonths").innerText = months
-        document.getElementById("itemNumberDays").innerText = days
-        document.getElementById("textDay").innerText = textdays
-        document.getElementById("itemNumberHours").innerText = hours
-        document.getElementById("itemNumberMinutes").innerText = minutes
-        document.getElementById("itemNumberSeconds").innerText = seconds
-        if(inpMonth.value >= '3'){
-            var apartFrom3 = nowDate - dateNew
-            var month3 = Math.floor(apartFrom3/(1000*60*60*24*30))
-            var dayMonth3 = Math.floor(((apartFrom3/(1000*60*60*24))-(month3*(30))))
-            document.getElementById("itemNumberDays").innerHTML = dayMonth3
-        }
-        if(inpMonth.value == '2'){
-            var apartFrom2 = nowDate - dateNew
-            var month2 = Math.floor(apartFrom2/(1000*60*60*24*30))
-            var dayMonth2 = Math.floor(((apartFrom2/(1000*60*60*24))-(month2*(29)))+1)
-            document.getElementById("itemNumberDays").innerHTML = dayMonth2
-        }
+    // ----Nhiệt độ ngày mai------
+    for(let i=7; i<15;i+=8){
+        console.log(dataWeather.list[i]);
+        var nhietdoTomorrow = $('.nhietdoTomorrow');
+        var textWeatherTomorrow = $('.textWeatherTomorrow');
+        var windTomorrow = $('.windTomorrow');
+        var eyeTomorrow = $(".eyeTomorrow");
+        var cloudTomorrow =$(".cloudTomorrow");
+        var humidityTomorrow = $('.humidityTomorrow');
+        nhietdoTomorrow.innerHTML = `${Math.round(dataWeather.list[i].main.temp-273)}`
+        iconTomorrow.src = `http://openweathermap.org/img/wn/${dataWeather.list[i].weather[0].icon}@2x.png`
+        textWeatherTomorrow.innerHTML = `${dataWeather.list[i].weather[0].description.charAt(0).toUpperCase() + dataWeather.list[i].weather[0].description.slice(1)}`;
+        windTomorrow.innerHTML = `<i class="fa-solid fa-wind"></i>Tốc độ gió: ${dataWeather.list[i].wind.speed}m/s`;
+        eyeTomorrow.innerHTML = `<i class="fa-regular fa-eye"></i>Tầm nhìn: ${dataWeather.list[i].visibility}m`;
+        cloudTomorrow.innerHTML = `<i class="fa-solid fa-cloud"></i>Mây: ${dataWeather.list[i].clouds.all}%`;
+        humidityTomorrow.innerHTML = `<i class="fa-solid fa-droplet"></i>Độ ẩm: ${dataWeather.list[i].main.humidity}%`;
     }
-    var x = setInterval(() => {
-        return setTimeBox();
-    })
-    
-    var input = document.querySelectorAll(".form-date input");
-    input.forEach((item)=>{
-        item.addEventListener("click",()=>{
-            clearInterval(x);
-        })
-    })
-    var nowDate = new Date().getTime()
-    if(dateNew > nowDate){
-        alert("Không được điền quá ngày hiện tại")
-        clearInterval(x)
-        day.innerHTML = ''
-        month.innerHTML = ''
-        year.innerHTML = ''
-        textBoyimg.innerHTML = ''
-        textGirlimg.innerHTML = ''
-        input.forEach((ele)=>{
-            ele.value = ''
-        })
+    // ----------dự báo theo ngày----------
+    for(let i=8; i<dataWeather.list.length; i+=8){
+        console.log(dataWeather.list[i]);
+        var dateItem = new Date(dataWeather.list[i].dt_txt);
+        var option = { weekday: 'long', year:'numeric', month:'long', day:'numeric'};
+        dateItem = dateItem.toLocaleDateString(undefined,option);
+        var divDate = document.createElement("div");
+        divDate.classList.add("item_date")
+        var boxDate = $(".boxDate");
+        divDate.innerHTML = `
+                            <div class="textItem-date">
+                                <h3 class="title-textItem">${dateItem}</h3>
+                                <div class="desciption">${dataWeather.list[i].weather[0].description}</div>
+                            </div>
+                            <div class="temperatureItem-date">
+                                <div class="icon-date">
+                                    <img src="http://openweathermap.org/img/wn/${dataWeather.list[i].weather[0].icon}@2x.png" alt="">
+                                </div>
+                                <div class="temp_max">${Math.round(dataWeather.list[i].main.temp-273)}°C</div>
+                            </div>
+                            `
+        boxDate.appendChild(divDate);
+    }
+
+}
+input.addEventListener("keypress",(e)=>{
+    var inputValue = input.value.trim();
+    if(e.key == 'Enter'){
+        setTimeout(function(){
+            var boxItem = document.querySelectorAll(".item__hourly")
+            var boxDateItem = document.querySelectorAll(".item_date")
+            for(let i =0; i<boxItem.length;i++){
+                boxItem[i].remove()
+            }
+            for(let i =0; i<boxDateItem.length;i++){
+                boxDateItem[i].remove()
+            }
+            console.log(boxItem);
+            weatherAPI(inputValue);
+            search.classList.remove("active");
+            input.classList.remove("active");
+            city.classList.remove("active");
+            input.value = ''
+        },100)
     }
 })
-function imageUser(){
-    var userLove = document.querySelector("#userLove1");
-    var btnUser = document.querySelector("#btnUser1");
-    var userLove2 = document.querySelector("#userLove2");
-    var btnUser2 = document.querySelector("#btnUser2");
-    btnUser.addEventListener("click",()=>{
-        userLove.click()
-    })
-    btnUser2.addEventListener("click",()=>{
-        userLove2.click()
-    })
-    userLove.addEventListener("change", function(){
-        const file = this.files[0];
-        var spanText = document.querySelector("#textUser1")
-        var img1 = document.querySelector("#image1 img")
-        spanText.innerHTML = file.name
-        if(file){
-            const reader = new FileReader();
-            reader.onload = function(){
-                const result = reader.result;
-                img1.src = result
-            }
-            reader.readAsDataURL(file);
-        }
-    })
-    userLove2.addEventListener("change", function(){
-        const file2 = this.files[0];
-        var spanText2 = document.querySelector("#textUser2")
-        var img2 = document.querySelector("#image2 img")
-        spanText2.innerHTML = file2.name
-        if(file2){
-            const reader2 = new FileReader()
-            reader2.onload = function(){
-                const result2 = reader2.result
-                img2.src = result2
-            }
-            reader2.readAsDataURL(file2);
-        }
-    })
-}
-imageUser()
-
-
-
-
+weatherAPI('Ha noi')
 
 
