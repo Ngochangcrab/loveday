@@ -194,6 +194,6 @@ input.addEventListener("keypress",(e)=>{
         },100)
     }
 })
-weatherAPI('Ha noi')
+weatherAPI('Tuyen quang')
 
 
